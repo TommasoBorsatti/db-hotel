@@ -43,8 +43,55 @@ LIMIT 1;
 
 JOIN
 1) Come si chiamano gli ospiti che hanno fatto più di due prenotazioni?
-2) Stampare tutti gli ospiti per ogni prenotazione
+
+SELECT COUNT(prenotazioni_has_ospiti.id) AS 'prenotazioni', ospiti.name, ospiti.lastname
+FROM `prenotazioni_has_ospiti` 
+LEFT JOIN ospiti
+ON ospiti.id = prenotazioni_has_ospiti.ospite_id
+GROUP BY ospiti.id,  prenotazioni_has_ospiti.created_at, ospiti.name, ospiti.lastname
+HAVING `prenotazioni` > 1
+ORDER BY `prenotazioni` DESC ;
+
+2) Stampare tutti gli ospiti per ogni prenotazione:
+
+SELECT prenotazioni_has_ospiti.id AS 'prenotazioni', ospiti.name, ospiti.lastname, prenotazioni_has_ospiti.created_at
+FROM `prenotazioni_has_ospiti` 
+LEFT JOIN ospiti
+ON ospiti.id = prenotazioni_has_ospiti.ospite_id
+ORDER BY `prenotazioni` ASC;
+
 3) Stampare Nome, Cognome, Prezzo e Pagante per tutte le prenotazioni fatte a Maggio 2018
+
+SELECT prenotazioni_has_ospiti.id AS 'prenotazioni', ospiti.name, ospiti.lastname, prenotazioni_has_ospiti.created_at
+FROM `prenotazioni_has_ospiti` 
+LEFT JOIN ospiti
+ON ospiti.id = prenotazioni_has_ospiti.ospite_id
+WHERE YEAR(prenotazioni_has_ospiti.created_at) = '2018'
+AND MONTH(prenotazioni_has_ospiti.created_at) = '05'
+ORDER BY `prenotazioni` ASC;
+
+
 4) Fai la somma di tutti i prezzi delle prenotazioni per le stanze del primo piano
-5) Prendi i dati di fatturazione per la prenotazione con id=7
+
+SELECT SUM(pagamenti.price) AS 'totale_prenot_primo_piano', stanze.floor
+FROM `prenotazioni` 
+LEFT JOIN stanze
+ON stanze.id = prenotazioni.stanza_id
+LEFT JOIN pagamenti
+ON prenotazioni.id = pagamenti.prenotazione_id
+WHERE stanze.floor = 1;
+
+5) Prendi i dati di fatturazione per la prenotazione con id=7:
+
+SELECT prenotazioni_has_ospiti.id, ospiti.name, ospiti.lastname, pagamenti.price
+FROM `prenotazioni_has_ospiti` 
+LEFT JOIN ospiti
+ON ospiti.id = prenotazioni_has_ospiti.ospite_id
+LEFT JOIN prenotazioni
+ON prenotazioni.id = prenotazioni_has_ospiti.prenotazione_id
+LEFT JOIN pagamenti
+ON prenotazioni.id = pagamenti.prenotazione_id
+WHERE prenotazioni_has_ospiti.id = 7;
+
 6) Le stanze sono state tutte prenotate almeno una volta? (Visualizzare le stanze non ancora prenotate) 
+
